@@ -40,3 +40,27 @@ def text_node_to_html_node(text_node: TextNode) -> LeafNode:
             return LeafNode("img", "", {"src": text_node.url, "alt": text_node.text})
         case _:
             raise Exception("Text type not valid")
+
+def split_nodes_delimiter(old_nodes: list[TextNode], delimiter: str, 
+text_type: TextType) -> list[TextNode]:
+    new_nodes = []
+    for node in old_nodes:
+        if not node.text_type.TEXT:
+            new_nodes.append(node)
+        else:
+            split_text = node.text.split(delimiter)
+            if len(split_text) % 2 == 0:
+                raise Exception("Markdown Syntax Error: No closing delimiter detected")
+            for x in range(0, len(split_text)):
+                if split_text[x] == "":
+                    continue
+                if x % 2 != 0:
+                    new_nodes.append(TextNode(split_text[x], text_type))
+                else:
+                    new_nodes.append(TextNode(split_text[x], TextType.TEXT))
+    return new_nodes
+            
+                
+            
+    
+
