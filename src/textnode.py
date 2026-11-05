@@ -1,5 +1,7 @@
 from enum import Enum
 from htmlnode import LeafNode
+from extract_markdown import extract_markdown_images, extract_markdown_links
+import re
 
 class TextType(Enum):
     TEXT = "text"
@@ -59,8 +61,40 @@ text_type: TextType) -> list[TextNode]:
                 else:
                     new_nodes.append(TextNode(split_text[x], TextType.TEXT))
     return new_nodes
-            
-                
-            
-    
+
+def split_nodes_image(old_nodes: list[TextNode]) -> list[TextNode]:
+    new_nodes = []
+    for node in old_nodes:
+        if not node.text_type.TEXT:
+            new_nodes.append(node)
+        else:
+            images = extract_markdown_images(node.text)
+            text = node.text
+            for image in images:
+                sections = text.split(f"![{image[0]}]({image[1]})", 1)
+                if sections[0] != "":
+                    new_nodes.append(TextNode(sections[0], TextType.TEXT))
+                text = sections[1]
+                new_nodes.append(TextNode(image[0], TextType.IMAGE, image[1]))
+            if text != "":
+                new_nodes.append(TextNode(text, TextType.TEXT))
+    return new_nodes
+
+def split_nodes_link(old_nodes: list[TextNode]) -> list[TextNode]:           
+    new_nodes = []
+    for node in old_nodes:
+        if not node.text_type.TEXT:
+            new_nodes.append(node)
+        else:
+            links = extract_markdown_links(node.text)
+            text = node.text
+            for link in links:
+                sections = text.split(f"[{link[0]}]({link[1]})", 1)
+                if sections[0] != "":
+                    new_nodes.append(TextNode(sections[0], TextType.TEXT))
+                text = sections[1]
+                new_nodes.append(TextNode(link[0], TextType.LINK, link[1]))
+            if text != "":
+                new_nodes.append(TextNode(text, TextType.TEXT))
+    return new_nodes
 
