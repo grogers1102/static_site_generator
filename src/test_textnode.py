@@ -1,5 +1,5 @@
 import unittest
-from textnode import TextNode, TextType, text_node_to_html_node, split_nodes_delimiter, split_nodes_image, split_nodes_link
+from textnode import *
 
 class TestTextNode(unittest.TestCase):
     def test_eq1(self):
@@ -130,7 +130,49 @@ class TestTextNode(unittest.TestCase):
             ],
             new_nodes
         )
-    
+    def test_text_to_nodes1(self):
+        text = "This is **text** with an _italic_ word and a `code block` and an ![obi wan image](https://i.imgur.com/fJRm4Vk.jpeg) and a [link](https://boot.dev)" 
+        new_nodes = text_to_textnodes(text)
+        self.assertEqual(
+            [
+                TextNode("This is ", TextType.TEXT),
+                TextNode("text", TextType.BOLD),
+                TextNode(" with an ", TextType.TEXT),
+                TextNode("italic", TextType.ITALIC),
+                TextNode(" word and a ", TextType.TEXT),
+                TextNode("code block", TextType.CODE),
+                TextNode(" and an ", TextType.TEXT),
+                TextNode("obi wan image", TextType.IMAGE, "https://i.imgur.com/fJRm4Vk.jpeg"),
+                TextNode(" and a ", TextType.TEXT),
+                TextNode("link", TextType.LINK, "https://boot.dev"),
+            ], 
+            new_nodes
+        )
+    def test_text_to_nodes2(self):
+        text = "`This` is **text****text** and ![obi wan image](https://i.imgur.com/fJRm4Vk.jpeg) ![image](https://i.imgur.com/zjjcJKZ.png)" 
+        new_nodes = text_to_textnodes(text)
+        self.assertEqual(
+            [
+                TextNode("This", TextType.CODE),
+                TextNode(" is ", TextType.TEXT),
+                TextNode("text", TextType.BOLD),
+                TextNode("text", TextType.BOLD),
+                TextNode(" and ", TextType.TEXT),
+                TextNode("obi wan image", TextType.IMAGE, "https://i.imgur.com/fJRm4Vk.jpeg"),
+                TextNode(" ", TextType.TEXT),
+                TextNode("image", TextType.IMAGE, "https://i.imgur.com/zjjcJKZ.png"),
+            ], 
+            new_nodes
+        )
+    def test_text_to_nodes3(self):
+        text = "This is just normal text with no code, bold, italic, links, or images." 
+        new_nodes = text_to_textnodes(text)
+        self.assertEqual(
+            [
+                TextNode("This is just normal text with no code, bold, italic, links, or images.", TextType.TEXT),
+            ], 
+            new_nodes
+        )
 
 
 if __name__ == "__main__":
