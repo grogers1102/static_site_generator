@@ -64,7 +64,7 @@ def markdown_to_html_node(markdown):
             lines = []
             for item in items:
                 item_text = ""
-                if item[1] == " ":
+                if item.startswith('> ', 0):
                     item_text = item[2:]
                 else:
                     item_text = item[1:]
