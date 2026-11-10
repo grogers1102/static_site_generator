@@ -66,5 +66,5 @@ def main():
    else:
       base_path = sys.argv[1]
    copy_dir_to_other("static", "docs")
-   generate_pages_recursive("./content", "template.html", "./public", base_path)
+   generate_pages_recursive("./content", "template.html", "./docs", base_path)
 main()
